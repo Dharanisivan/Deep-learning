@@ -11,14 +11,13 @@ for i in range(len(X)):
     if y[i] == 0:
         plt.scatter(X[i][0], X[i][1], color='red')
     else:
-       ![IMG_20250807_203354](https://github.com/user-attachments/assets/d346835f-2640-439f-a2f0-c8a77d162464)
  plt.scatter(X[i][0], X[i][1], color='blue')
 x_values = [0, 1]
 y_values = (-(clf.coef_[0][0]*np.array(x_values) + clf.intercept_)) / clf.coef_[0][1]
 plt.plot(x_values, y_values)
 plt.title('Perceptron Decision Boundary for XOR')
 plt.xlabel('X1')
-plt.ylabel('X2')![IMG_20250807_203354](https://github.com/user-attachments/assets/286f0f9c-5ae8-49fb-81e6-f65d0cc96a56)
+plt.ylabel('X2')!
 
 plt.grid(True)
 plt.show()

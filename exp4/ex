@@ -1,0 +1,155 @@
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Embedding, LSTM, Dense
+from tensorflow.keras.preprocessing.text import Tokenizer
+from tensorflow.keras.utils import pad_sequences, to_categorical
+
+# Sample Shakespeare-like text (replace with your own corpus or file reading)
+sample_text = """
+To be or not to be that is the question
+Whether tis nobler in the mind to suffer
+The slings and arrows of outrageous fortune
+Or to take arms against a sea of troubles
+"""
+
+# Preprocessing: lowercase and split into lines
+corpus = [line.strip().lower() for line in sample_text.strip().split('\n') if line.strip()]
+
+# Initialize and fit tokenizer
+tokenizer = Tokenizer()
+tokenizer.fit_on_texts(corpus)
+
+total_words = len(tokenizer.word_index) + 1
+
+# Create input sequences (n-grams)
+input_sequences = []
+for line in corpus:
+    token_list = tokenizer.texts_to_sequences([line])[0]
+    for i in range(1, len(token_list)):
+        n_gram_sequence = token_list[:i + 1]
+        input_sequences.append(n_gram_sequence)
+
+# Pad sequences
+max_len = max(len(seq) for seq in input_sequences)
+input_sequences = pad_sequences(input_sequences, maxlen=max_len, padding='pre')
+
+# Split into features and labels
+X, y = input_sequences[:, :-1], input_sequences[:, -1]
+
+# One-hot encode labels
+y = to_categorical(y, num_classes=total_words)
+
+# Define model
+model = Sequential([
+    Embedding(total_words, 100, input_length=max_len - 1),
+    LSTM(150),
+    Dense(total_words, activation='softmax')
+])
+
+model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+
+# Train model
+model.fit(X, y, epochs=50, verbose=1)
+output:
+Epoch 1/50
+/usr/local/lib/python3.12/dist-packages/keras/src/layers/core/embedding.py:97: UserWarning: Argument `input_length` is deprecated. Just remove it.
+  warnings.warn(
+1/1 ━━━━━━━━━━━━━━━━━━━━ 3s 3s/step - accuracy: 0.0000e+00 - loss: 3.2967
+Epoch 2/50
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 59ms/step - accuracy: 0.0667 - loss: 3.2885
+Epoch 3/50
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 58ms/step - accuracy: 0.1333 - loss: 3.2803
+Epoch 4/50
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 142ms/step - accuracy: 0.1333 - loss: 3.2718
+Epoch 5/50
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 58ms/step - accuracy: 0.1667 - loss: 3.2628
+Epoch 6/50
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 56ms/step - accuracy: 0.1667 - loss: 3.2530
+Epoch 7/50
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 56ms/step - accuracy: 0.1667 - loss: 3.2421
+Epoch 8/50
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 64ms/step - accuracy: 0.1333 - loss: 3.2297
+Epoch 9/50
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 59ms/step - accuracy: 0.1000 - loss: 3.2152
+Epoch 10/50
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 58ms/step - accuracy: 0.1000 - loss: 3.1981
+Epoch 11/50
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 56ms/step - accuracy: 0.1000 - loss: 3.1777
+Epoch 12/50
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 59ms/step - accuracy: 0.1000 - loss: 3.1531
+Epoch 13/50
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 59ms/step - accuracy: 0.1000 - loss: 3.1242
+Epoch 14/50
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 55ms/step - accuracy: 0.1000 - loss: 3.0920
+Epoch 15/50
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 60ms/step - accuracy: 0.1000 - loss: 3.0609
+Epoch 16/50
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 58ms/step - accuracy: 0.1000 - loss: 3.0399
+Epoch 17/50
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 59ms/step - accuracy: 0.1000 - loss: 3.0278
+Epoch 18/50
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 59ms/step - accuracy: 0.1000 - loss: 3.0056
+Epoch 19/50
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 58ms/step - accuracy: 0.1000 - loss: 2.9710
+Epoch 20/50
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 58ms/step - accuracy: 0.1333 - loss: 2.9332
+Epoch 21/50
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 60ms/step - accuracy: 0.1667 - loss: 2.8977
+Epoch 22/50
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 63ms/step - accuracy: 0.2000 - loss: 2.8634
+Epoch 23/50
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 57ms/step - accuracy: 0.2333 - loss: 2.8261
+Epoch 24/50
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 56ms/step - accuracy: 0.2667 - loss: 2.7815
+Epoch 25/50
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 141ms/step - accuracy: 0.2333 - loss: 2.7273
+Epoch 26/50
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 56ms/step - accuracy: 0.2333 - loss: 2.6652
+Epoch 27/50
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 58ms/step - accuracy: 0.2333 - loss: 2.5995
+Epoch 28/50
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 56ms/step - accuracy: 0.2333 - loss: 2.5314
+Epoch 29/50
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 58ms/step - accuracy: 0.1667 - loss: 2.4603
+Epoch 30/50
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 60ms/step - accuracy: 0.1667 - loss: 2.3861
+Epoch 31/50
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 57ms/step - accuracy: 0.3000 - loss: 2.3049
+Epoch 32/50
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 57ms/step - accuracy: 0.3000 - loss: 2.2320
+Epoch 33/50
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 64ms/step - accuracy: 0.3667 - loss: 2.1599
+Epoch 34/50
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 58ms/step - accuracy: 0.3667 - loss: 2.0770
+Epoch 35/50
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 59ms/step - accuracy: 0.5667 - loss: 1.9911
+Epoch 36/50
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 57ms/step - accuracy: 0.5333 - loss: 1.9151
+Epoch 37/50
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 58ms/step - accuracy: 0.6333 - loss: 1.8476
+Epoch 38/50
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 62ms/step - accuracy: 0.7667 - loss: 1.7626
+Epoch 39/50
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 58ms/step - accuracy: 0.8000 - loss: 1.6737
+Epoch 40/50
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 74ms/step - accuracy: 0.7667 - loss: 1.6043
+Epoch 41/50
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 123ms/step - accuracy: 0.6667 - loss: 1.5451
+Epoch 42/50
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 58ms/step - accuracy: 0.7000 - loss: 1.4710
+Epoch 43/50
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 58ms/step - accuracy: 0.6667 - loss: 1.3943
+Epoch 44/50
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 94ms/step - accuracy: 0.7333 - loss: 1.3470
+Epoch 45/50
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 106ms/step - accuracy: 0.8333 - loss: 1.2968
+Epoch 46/50
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 58ms/step - accuracy: 0.8333 - loss: 1.2260
+Epoch 47/50
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 137ms/step - accuracy: 0.8000 - loss: 1.1800
+Epoch 48/50
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 59ms/step - accuracy: 0.9333 - loss: 1.1530
+Epoch 49/50
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 136ms/step - accuracy: 0.8000 - loss: 1.0883
+Epoch 50/50
+1/1 ━━━━━━━━━━━━━━━━━━━━ 0s 59ms/step - accuracy: 0.9000 - loss: 1.0405
+<keras.src.callbacks.history.History at 0x7fbc8d9215b0
